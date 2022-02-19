@@ -4,9 +4,10 @@ import {
 	useViewportScroll,
 	Variants,
 } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.div)`
 	position: fixed;
@@ -40,13 +41,51 @@ const ITems = styled(motion.ul)`
 `;
 const Item = styled(motion.li)`
 	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 	margin-right: 20px;
+	position: relative;
+	color: ${(props) => props.theme.white.darker};
+	&:hover {
+		color: ${(props) => props.theme.white.lighter};
+	}
+	transition: color 0.3s ease-in-out;
 `;
-const Search = styled(motion.div)`
-	color: inherit;
+
+const Circle = styled(motion.div)`
+	position: absolute;
+	bottom: -10px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background-color: ${(props) => props.theme.red};
 `;
-const Input = styled(motion.div)`
-	color: inherit;
+
+const Search = styled(motion.form)`
+	position: relative;
+	display: flex;
+	align-items: center;
+	color: ${(props) => props.theme.white.lighter};
+	svg {
+		height: 25px;
+	}
+`;
+const Input = styled(motion.input)`
+	transform-origin: right center;
+	z-index: -1;
+	position: absolute;
+	right: 0;
+	margin: auto, 0;
+	padding: 5px 10px;
+	padding-left: 40px;
+	font-size: 16px;
+	color: ${(props) => props.theme.white.lighter};
+	background-color: rgba(0, 0, 0, 0.8);
+	border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
 const navVariants: Variants = {
@@ -61,9 +100,33 @@ const navVariants: Variants = {
 	},
 };
 
+interface IForm {
+	keyword: string;
+}
+
 function Header() {
+	const homeMatch = useMatch("/");
+	const tvMatch = useMatch("/tv");
 	const navAnimation = useAnimation();
+	const inputAnimation = useAnimation();
 	const { scrollY } = useViewportScroll();
+	const { register, handleSubmit } = useForm<IForm>();
+	const [searchOpen, setSearchOpen] = useState(false);
+	const navigate = useNavigate();
+	const onValid = ({ keyword }: IForm) => {
+		navigate(`/search?keyowrd=${keyword}`);
+	};
+	const toggleSearch = () => {
+		searchOpen
+			? inputAnimation.start({
+					scaleX: 0,
+			  })
+			: inputAnimation.start({
+					scaleX: 1,
+			  });
+
+		setSearchOpen((prev) => !prev);
+	};
 	useEffect(() => {
 		scrollY.onChange(() =>
 			scrollY.get() > 80
@@ -84,17 +147,45 @@ function Header() {
 				</Logo>
 				<ITems>
 					<Item>
-						<Link to="/">Home</Link>
+						<Link to="/">
+							Home {homeMatch && <Circle layoutId="circle" />}
+						</Link>
 					</Item>
 					<Item>
-						<Link to="/tv">TV Shows</Link>
+						<Link to="/tv">
+							TV Shows {tvMatch && <Circle layoutId="circle" />}
+						</Link>
 					</Item>
 				</ITems>
 			</Col>
 			<Col>
-				<Search>
-					<svg></svg>
-					<Input />
+				<Search onSubmit={handleSubmit(onValid)}>
+					<motion.svg
+						onClick={toggleSearch}
+						animate={{
+							x: searchOpen ? -185 : 0,
+						}}
+						transition={{ type: "tween" }}
+						fill="currentColor"
+						viewBox="0 0 20 20"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							fillRule="evenodd"
+							d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+							clipRule="evenodd"
+						></path>
+					</motion.svg>
+					<Input
+						{...register("keyword", {
+							required: true,
+							minLength: 2,
+						})}
+						animate={inputAnimation}
+						initial={{ scaleX: 0 }}
+						transition={{ type: "tween" }}
+						placeholder="Search for Movie or TVShows"
+					/>
 				</Search>
 			</Col>
 		</Nav>
