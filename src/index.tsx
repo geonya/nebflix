@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
 import GlobalStyle from "./Styles/globalstyles";
-import GlobalFont from "./Styles/fonts/font";
 
 const client = new QueryClient();
 
@@ -16,7 +15,6 @@ ReactDOM.render(
 			<QueryClientProvider client={client}>
 				<ThemeProvider theme={theme}>
 					<GlobalStyle />
-					<GlobalFont />
 					<App />
 				</ThemeProvider>
 			</QueryClientProvider>

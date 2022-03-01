@@ -52,7 +52,7 @@ table {
 body {
   height: 200vh;
   background-color:${(props) => props.theme.black.darker};
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color:${(props) => props.theme.white.lighter};
   font-weight: 300;
   line-height:1.2;
