@@ -1,14 +1,10 @@
-import {
-	AnimatePresence,
-	motion,
-	useViewportScroll,
-	Variants,
-} from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
-import { useQuery } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
+import { useResetRecoilState, useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { getMovies, IGetMovieResult } from "../../api";
+import { currentSlider, getNowPlayingMovies, IGetMovieResult } from "../../api";
 import { makeImagePath } from "../../utils";
 import MovieBox from "./MovieBox";
 
@@ -115,12 +111,14 @@ const infoVariants: Variants = {
 const offSet = 6;
 
 const NowPlaying = () => {
+	const setCurrentSlider = useSetRecoilState(currentSlider);
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
-	const { data, isLoading } = useQuery<IGetMovieResult>(
-		["movies", "nowPlaying"],
-		getMovies
-	);
 	const [index, setIndex] = useState(0);
+	const queryClient = useQueryClient();
+	const data = queryClient.getQueryData<IGetMovieResult>([
+		"movies",
+		"nowPlaying",
+	]);
 	const nextSlide = () => {
 		if (data) {
 			setFirstLoad(false);
@@ -131,6 +129,7 @@ const NowPlaying = () => {
 	};
 	const navigate = useNavigate();
 	const onBoxClicked = (movieId: number) => {
+		setCurrentSlider(["movies", "nowPlaying"]);
 		navigate(`/movies/${movieId}`);
 	};
 	const theme = useTheme();
@@ -191,7 +190,6 @@ const NowPlaying = () => {
 					</NextBtn>
 				</AnimatePresence>
 			</Slider>
-			<MovieBox data={data} />
 		</>
 	);
 };

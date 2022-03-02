@@ -1,9 +1,10 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
-import { useQuery } from "react-query";
-import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "react-query";
+import { useMatch, useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { getTopRatedMovies, IGetMovieResult } from "../../api";
+import { currentSlider, getTopRatedMovies, IGetMovieResult } from "../../api";
 import { makeImagePath } from "../../utils";
 import MovieBox from "./MovieBox";
 
@@ -111,10 +112,12 @@ const offSet = 6;
 
 const TopRated = () => {
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
-	const { data, isLoading } = useQuery<IGetMovieResult>(
-		["movies", "topRated"],
-		getTopRatedMovies
-	);
+	const setCurrentSlider = useSetRecoilState(currentSlider);
+	const queryClient = useQueryClient();
+	const data = queryClient.getQueryData<IGetMovieResult>([
+		"movies",
+		"topRated",
+	]);
 	const [index, setIndex] = useState(0);
 	const nextSlide = () => {
 		if (data) {
@@ -126,10 +129,10 @@ const TopRated = () => {
 	};
 	const navigate = useNavigate();
 	const onBoxClicked = (movieId: number) => {
+		setCurrentSlider(["movies", "topRated"]);
 		navigate(`/movies/${movieId}`);
 	};
 	const theme = useTheme();
-
 	return (
 		<>
 			<Slider>
@@ -187,7 +190,6 @@ const TopRated = () => {
 					</NextBtn>
 				</AnimatePresence>
 			</Slider>
-			<MovieBox data={data} />
 		</>
 	);
 };

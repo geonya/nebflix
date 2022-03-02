@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
+import { useQueryClient } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { IGetMovieResult } from "../../api";
@@ -57,18 +58,14 @@ const Overlay = styled(motion.div)`
 	opacity: 0;
 `;
 
-interface IMovieBox {
-	data?: IGetMovieResult;
-}
-
-const MovieBox = ({ data }: IMovieBox) => {
+const MovieBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
+	const queryClient = useQueryClient();
+	const data = queryClient.getQueryData<IGetMovieResult>(queryKey);
 	const navigate = useNavigate();
 	const bigMovieMatch = useMatch("/movies/:movieId");
-	const clickedMovie =
-		bigMovieMatch?.params.movieId &&
-		data?.results.find(
-			(movie) => String(movie.id) === bigMovieMatch?.params.movieId
-		);
+	const clickedMovie = data?.results.find(
+		(movie) => String(movie.id) === bigMovieMatch?.params.movieId
+	);
 	const onOverlayClick = () => {
 		navigate("../", { replace: true });
 	};
@@ -82,6 +79,7 @@ const MovieBox = ({ data }: IMovieBox) => {
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 					/>
+
 					<BigMovie
 						layoutId={bigMovieMatch.params.movieId}
 						style={{ top: scrollY.get() + 100 }}
