@@ -1,6 +1,5 @@
-import { QueryClient, useQuery, useQueryClient } from "react-query";
 import styled from "styled-components";
-import { getNowPlayingMovies, IGetMovieResult } from "../api";
+import { IGetMovieResult } from "../api";
 import { makeImagePath } from "../utils";
 
 const Main = styled.div<{ bgphoto: string }>`
@@ -23,17 +22,15 @@ const Overview = styled.p`
 	font-size: 30px;
 	width: 50%;
 `;
-
-const Banner = () => {
-	const queryClient = useQueryClient();
-	const data = queryClient.getQueryData<IGetMovieResult>([
-		"movies",
-		"nowPlaying",
-	]);
+interface IBanner {
+	movies?: IGetMovieResult;
+}
+const Banner = (data: IBanner) => {
+	const { movies }: IBanner = data;
 	return (
-		<Main bgphoto={makeImagePath(data?.results[0].backdrop_path || "")}>
-			<Title>{data?.results[0].title}</Title>
-			<Overview>{data?.results[0].overview}</Overview>
+		<Main bgphoto={makeImagePath(movies?.results[0].backdrop_path || "")}>
+			<Title>{movies?.results[0].title}</Title>
+			<Overview>{movies?.results[0].overview}</Overview>
 		</Main>
 	);
 };

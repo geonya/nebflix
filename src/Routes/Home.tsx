@@ -1,5 +1,4 @@
 import { useQuery } from "react-query";
-import { useMatch } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
@@ -16,7 +15,6 @@ import TopRated from "../Components/Sliders/TopRated";
 const Wrapper = styled.div`
 	overflow-x: hidden;
 `;
-const Section = styled.div``;
 
 function Home() {
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } =
@@ -26,13 +24,25 @@ function Home() {
 		);
 	const { data: topRatedData, isLoading: topRatedLoading } =
 		useQuery<IGetMovieResult>(["movies", "topRated"], getTopRatedMovies);
-	const queryKey = useRecoilValue(currentSlider);
+	const movieQueryKey = useRecoilValue(currentSlider);
 	return (
 		<Wrapper>
-			<Banner />
-			<NowPlaying />
-			<TopRated />
-			<MovieBox queryKey={queryKey} />
+			{nowPlayingLoading ? (
+				<span>Loading...</span>
+			) : (
+				<Banner movies={nowPlayingData} />
+			)}
+			{nowPlayingLoading ? (
+				<span>Loading...</span>
+			) : (
+				<NowPlaying movies={nowPlayingData} />
+			)}
+			{topRatedLoading ? (
+				<span>Loading...</span>
+			) : (
+				<TopRated movies={topRatedData} />
+			)}
+			<MovieBox queryKey={movieQueryKey} />
 		</Wrapper>
 	);
 }

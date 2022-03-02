@@ -1,12 +1,11 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
-import { useQuery, useQueryClient } from "react-query";
-import { useMatch, useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { currentSlider, getTopRatedMovies, IGetMovieResult } from "../../api";
+import { currentSlider, IGetMovieResult } from "../../api";
 import { makeImagePath } from "../../utils";
-import MovieBox from "./MovieBox";
 
 const Slider = styled.div`
 	top: -100px;
@@ -110,19 +109,19 @@ const infoVariants: Variants = {
 
 const offSet = 6;
 
-const TopRated = () => {
+interface ITopRated {
+	movies?: IGetMovieResult;
+}
+
+const TopRated = (data: ITopRated) => {
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
 	const setCurrentSlider = useSetRecoilState(currentSlider);
-	const queryClient = useQueryClient();
-	const data = queryClient.getQueryData<IGetMovieResult>([
-		"movies",
-		"topRated",
-	]);
+	const { movies }: ITopRated = data;
 	const [index, setIndex] = useState(0);
 	const nextSlide = () => {
-		if (data) {
+		if (movies) {
 			setFirstLoad(false);
-			const totalMovies = data?.results.length - 1;
+			const totalMovies = movies?.results.length - 1;
 			const maxIndex = Math.floor(totalMovies / offSet) - 1;
 			setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
 		}
@@ -145,7 +144,7 @@ const TopRated = () => {
 						transition={{ type: "tween", duration: 1 }}
 						key={index}
 					>
-						{data?.results
+						{movies?.results
 							.slice(1)
 							.slice(index * offSet, (index + 1) * offSet)
 							.map((movie) => (

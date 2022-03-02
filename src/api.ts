@@ -10,7 +10,7 @@ export const currentSlider = atom<[string, string]>({
 	default: ["", ""],
 });
 
-interface IMovie {
+export interface IMovie {
 	backdrop_path: string;
 	id: number;
 	overview: string;
