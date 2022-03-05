@@ -1,17 +1,23 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { currentSlider, IGetMovieResult } from "../../api";
-import { makeImagePath } from "../../utils";
+import { currentSlider, IGetMovieResult } from "../../../api";
+import { makeImagePath } from "../../../utils";
 
 const Slider = styled.div`
-	top: -100px;
-	position: relative;
 	height: 200px;
-	margin-bottom: 50px;
+	position: relative;
+`;
+
+const SlideTitle = styled.h1`
+	position: absolute;
+	top: -50px;
+	left: 0;
+	font-size: 25px;
+	font-weight: 800;
+	margin-bottom: 20px;
 `;
 
 const Row = styled(motion.div)`
@@ -118,14 +124,18 @@ const TopRated = (data: ITopRated) => {
 	const setCurrentSlider = useSetRecoilState(currentSlider);
 	const { movies }: ITopRated = data;
 	const [index, setIndex] = useState(0);
+	const [sliding, setSliding] = useState(false);
 	const nextSlide = () => {
+		if (sliding) return;
 		if (movies) {
+			toggleSliding();
 			setFirstLoad(false);
 			const totalMovies = movies?.results.length - 1;
 			const maxIndex = Math.floor(totalMovies / offSet) - 1;
 			setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
 		}
 	};
+	const toggleSliding = () => setSliding((prev) => !prev);
 	const navigate = useNavigate();
 	const onBoxClicked = (movieId: number) => {
 		setCurrentSlider(["movies", "topRated"]);
@@ -135,7 +145,8 @@ const TopRated = (data: ITopRated) => {
 	return (
 		<>
 			<Slider>
-				<AnimatePresence>
+				<SlideTitle>명작 영화</SlideTitle>
+				<AnimatePresence onExitComplete={toggleSliding}>
 					<Row
 						variants={rowVariants}
 						initial={firstLoad ? { x: 0 } : "hidden"}

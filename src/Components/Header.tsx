@@ -102,7 +102,7 @@ interface IForm {
 
 function Header() {
 	const homeMatch = useMatch("/");
-	const tvMatch = useMatch("/tv");
+	const tvMatch = useMatch("/tvshows");
 	const navAnimation = useAnimation();
 	const inputAnimation = useAnimation();
 	const { scrollY } = useViewportScroll();
@@ -154,7 +154,7 @@ function Header() {
 						</Link>
 					</Item>
 					<Item>
-						<Link to="/tv">
+						<Link to="/tvshows">
 							TV Shows {tvMatch && <Circle layoutId="circle" />}
 						</Link>
 					</Item>

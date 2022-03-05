@@ -1,17 +1,24 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { currentSlider, IGetMovieResult } from "../../api";
-import { makeImagePath } from "../../utils";
+import { currentSlider, IGetMovieResult } from "../../../api";
+import { makeImagePath } from "../../../utils";
 
 const Slider = styled.div`
-	top: -100px;
+	top: -130px;
 	position: relative;
 	height: 200px;
-	margin-bottom: 50px;
+`;
+
+const SlideTitle = styled.h1`
+	position: absolute;
+	top: -50px;
+	left: 0;
+	font-size: 25px;
+	font-weight: 800;
+	margin-bottom: 20px;
 `;
 
 const Row = styled(motion.div)`
@@ -27,7 +34,7 @@ const NextBtn = styled(motion.div)`
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	top: 0px;
+	top: 0;
 	right: 0px;
 	width: 70px;
 	height: 100%;
@@ -118,14 +125,18 @@ const NowPlaying = (data: INowPlaying) => {
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
 	const [index, setIndex] = useState(0);
 	const { movies }: INowPlaying = data;
+	const [sliding, setSliding] = useState(false);
 	const nextSlide = () => {
+		if (sliding) return;
 		if (movies) {
+			toggleSliding();
 			setFirstLoad(false);
 			const totalMovies = movies?.results.length - 1;
 			const maxIndex = Math.floor(totalMovies / offSet) - 1;
 			setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
 		}
 	};
+	const toggleSliding = () => setSliding((prev) => !prev);
 	const navigate = useNavigate();
 	const onBoxClicked = (movieId: number) => {
 		setCurrentSlider(["movies", "nowPlaying"]);
@@ -135,7 +146,8 @@ const NowPlaying = (data: INowPlaying) => {
 	return (
 		<>
 			<Slider>
-				<AnimatePresence>
+				<SlideTitle>신규 컨텐츠</SlideTitle>
+				<AnimatePresence onExitComplete={toggleSliding}>
 					<Row
 						variants={rowVariants}
 						initial={firstLoad ? { x: 0 } : "hidden"}

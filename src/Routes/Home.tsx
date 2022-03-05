@@ -7,10 +7,10 @@ import {
 	getTopRatedMovies,
 	IGetMovieResult,
 } from "../api";
-import Banner from "../Components/Banner";
-import MovieBox from "../Components/Sliders/MovieBox";
-import NowPlaying from "../Components/Sliders/NowPlaying";
-import TopRated from "../Components/Sliders/TopRated";
+import Banner from "../Components/Movies/Banner";
+import InfoBox from "../Components/InfoBox";
+import NowPlaying from "../Components/Movies/Sliders/NowPlaying";
+import TopRated from "../Components/Movies/Sliders/TopRated";
 
 const Wrapper = styled.div`
 	overflow-x: hidden;
@@ -42,7 +42,7 @@ function Home() {
 			) : (
 				<TopRated movies={topRatedData} />
 			)}
-			<MovieBox queryKey={movieQueryKey} />
+			{movieQueryKey[0] ? <InfoBox queryKey={movieQueryKey} /> : null}
 		</Wrapper>
 	);
 }

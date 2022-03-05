@@ -2,8 +2,8 @@ import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useQueryClient } from "react-query";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { IGetMovieResult } from "../../api";
-import { makeImagePath } from "../../utils";
+import { IGetMovieResult } from "../api";
+import { makeImagePath } from "../utils";
 
 const BigMovie = styled(motion.div)`
 	background-color: ${(props) => props.theme.black.darker};
@@ -58,21 +58,21 @@ const Overlay = styled(motion.div)`
 	opacity: 0;
 `;
 
-const MovieBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
+const InfoBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
 	const queryClient = useQueryClient();
 	const data = queryClient.getQueryData<IGetMovieResult>(queryKey);
 	const navigate = useNavigate();
-	const bigMovieMatch = useMatch("/movies/:movieId");
-	const clickedMovie = data?.results.find(
-		(movie) => String(movie.id) === bigMovieMatch?.params.movieId
+	const infoMatch = useMatch(`/${queryKey[0]}/:id`);
+	const clickedTab = data?.results.find(
+		(data) => String(data.id) === infoMatch?.params.id
 	);
 	const onOverlayClick = () => {
-		navigate("../", { replace: true });
+		navigate("./", { replace: true });
 	};
 	const { scrollY } = useViewportScroll();
 	return (
 		<AnimatePresence>
-			{bigMovieMatch ? (
+			{infoMatch ? (
 				<>
 					<Overlay
 						onClick={onOverlayClick}
@@ -81,23 +81,21 @@ const MovieBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
 					/>
 
 					<BigMovie
-						layoutId={bigMovieMatch.params.movieId}
+						layoutId={infoMatch.params.id}
 						style={{ top: scrollY.get() + 100 }}
 					>
-						{clickedMovie && (
+						{clickedTab && (
 							<>
 								<BigCover
 									style={{
 										backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)), url(
-														${makeImagePath(clickedMovie.backdrop_path, "w500")}
+														${makeImagePath(clickedTab.backdrop_path, "w500")}
 													)`,
 									}}
 								></BigCover>
-								<BigTitle>{clickedMovie.title}</BigTitle>
+								<BigTitle>{clickedTab.title}</BigTitle>
 								<PlayBtn>Play</PlayBtn>
-								<BigOverview>
-									{clickedMovie.overview}
-								</BigOverview>
+								<BigOverview>{clickedTab.overview}</BigOverview>
 							</>
 						)}
 					</BigMovie>
@@ -107,4 +105,4 @@ const MovieBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
 	);
 };
 
-export default MovieBox;
+export default InfoBox;
