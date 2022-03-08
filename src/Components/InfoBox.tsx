@@ -1,8 +1,8 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useQueryClient } from "react-query";
-import { useMatch, useNavigate } from "react-router-dom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IGetMovieResult } from "../api";
+import { IGetMovieResult, sectionState } from "../atoms";
 import { makeImagePath } from "../utils";
 
 const BigMovie = styled(motion.div)`
@@ -58,21 +58,25 @@ const Overlay = styled(motion.div)`
 	opacity: 0;
 `;
 
-const InfoBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
+interface IInfoBox {
+	sectionName: string;
+}
+
+const InfoBox = ({ sectionName }: IInfoBox) => {
+	const [section, setSection] = useRecoilState(sectionState);
+	const sectionId = section[1];
 	const queryClient = useQueryClient();
-	const data = queryClient.getQueryData<IGetMovieResult>(queryKey);
-	const navigate = useNavigate();
-	const infoMatch = useMatch(`/${queryKey[0]}/:id`);
+	const data = queryClient.getQueryData<IGetMovieResult>(sectionName);
 	const clickedTab = data?.results.find(
-		(data) => String(data.id) === infoMatch?.params.id
+		(data) => String(data.id) === String(sectionId)
 	);
 	const onOverlayClick = () => {
-		navigate("./", { replace: true });
+		setSection(["", 0]);
 	};
 	const { scrollY } = useViewportScroll();
 	return (
 		<AnimatePresence>
-			{infoMatch ? (
+			{sectionId ? (
 				<>
 					<Overlay
 						onClick={onOverlayClick}
@@ -81,7 +85,7 @@ const InfoBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
 					/>
 
 					<BigMovie
-						layoutId={infoMatch.params.id}
+						layoutId={sectionId + ""}
 						style={{ top: scrollY.get() + 100 }}
 					>
 						{clickedTab && (
@@ -93,7 +97,9 @@ const InfoBox = ({ queryKey }: { [queryKey: string]: [string, string] }) => {
 													)`,
 									}}
 								></BigCover>
-								<BigTitle>{clickedTab.title}</BigTitle>
+								<BigTitle>
+									{clickedTab.title ?? clickedTab.name}
+								</BigTitle>
 								<PlayBtn>Play</PlayBtn>
 								<BigOverview>{clickedTab.overview}</BigOverview>
 							</>

@@ -1,49 +1,53 @@
 import { useQuery } from "react-query";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import {
-	currentSlider,
-	getNowPlayingTvShows,
-	getTopRatedTvShows,
-} from "../api";
+import { getNowPlayingTvShows, getTopRatedTvShows } from "../api";
 import InfoBox from "../Components/InfoBox";
-import Banner from "../Components/TvShows/Banner";
-import NowPlaying from "../Components/TvShows/Sliders/NowPlaying";
-import TopRated from "../Components/TvShows/Sliders/TopRated";
+import Sliders from "../Components/Sliders";
+import Banner from "../Components/Banner";
+import { sectionState } from "../atoms";
 
 const Wrapper = styled.div`
 	overflow-x: hidden;
 `;
 
 function TvShow() {
+	const [sectionName, _] = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } = useQuery(
-		["tvshows", "nowPlaying"],
+		["nowPlayingTvShows"],
 		getNowPlayingTvShows
 	);
 	const { data: topRatedData, isLoading: topRatedLoading } = useQuery(
-		["tvshows", "topRated"],
+		["topRatedTvShows"],
 		getTopRatedTvShows
 	);
-	const tvshowQueryKey = useRecoilValue(currentSlider);
 
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner tvshows={nowPlayingData} />
+				<Banner movies={nowPlayingData} />
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<NowPlaying tvshows={nowPlayingData} />
+				<Sliders
+					title="최신 시리즈"
+					data={nowPlayingData}
+					sectionName="nowPlayingTvShows"
+				/>
 			)}
 			{topRatedLoading ? (
 				<span>Loading...</span>
 			) : (
-				<TopRated tvshows={topRatedData} />
+				<Sliders
+					title="명작 시리즈"
+					data={topRatedData}
+					sectionName="topRatedTvShows"
+				/>
 			)}
-			{tvshowQueryKey[0] ? <InfoBox queryKey={tvshowQueryKey} /> : null}
+			{sectionName ? <InfoBox sectionName={sectionName + ""} /> : null}
 		</Wrapper>
 	);
 }

@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { IGetMovieResult, IGetTvResult } from "../../api";
-import { makeImagePath } from "../../utils";
+import { IGetMovieResult } from "../atoms";
+
+import { makeImagePath } from "../utils";
 
 const Main = styled.div<{ bgphoto: string }>`
 	width: 100%;
@@ -23,14 +24,14 @@ const Overview = styled.p`
 	width: 50%;
 `;
 interface IBanner {
-	tvshows?: IGetTvResult;
+	movies?: IGetMovieResult;
 }
 const Banner = (data: IBanner) => {
-	const { tvshows }: IBanner = data;
+	const { movies }: IBanner = data;
 	return (
-		<Main bgphoto={makeImagePath(tvshows?.results[0].backdrop_path || "")}>
-			<Title>{tvshows?.results[0].name}</Title>
-			<Overview>{tvshows?.results[0].overview}</Overview>
+		<Main bgphoto={makeImagePath(movies?.results[0].backdrop_path || "")}>
+			<Title>{movies?.results[0].title || movies?.results[0].name}</Title>
+			<Overview>{movies?.results[0].overview}</Overview>
 		</Main>
 	);
 };
