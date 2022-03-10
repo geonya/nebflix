@@ -1,8 +1,8 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
 import { useQueryClient } from "react-query";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { IGetMovieResult, sectionState } from "../atoms";
+import { favState, IGetMovieResult, sectionState } from "../atoms";
 import { makeImagePath } from "../utils";
 
 const BigMovie = styled(motion.div)`
@@ -22,20 +22,19 @@ const BigCover = styled(motion.div)`
 	height: 400px;
 `;
 const BigTitle = styled(motion.h3)`
-	position: relative;
-	top: -130px;
 	padding: 10px;
 	padding-left: 50px;
 	font-size: 36px;
 	color: ${(props) => props.theme.white.lighter};
+	margin-bottom: 10px;
 `;
 const PlayBtn = styled(motion.button)`
 	all: unset;
 	margin-left: 50px;
-	top: -120px;
+
 	width: 80px;
 	height: 30px;
-	position: relative;
+
 	text-align: center;
 	font-weight: 600;
 	background-color: ${(props) => props.theme.white.lighter};
@@ -58,20 +57,82 @@ const Overlay = styled(motion.div)`
 	opacity: 0;
 `;
 
+const FavBtn = styled(motion.button)<{ isLike?: boolean }>`
+	all: unset;
+	width: 30px;
+	height: 30px;
+	color: ${(props) =>
+		props.isLike ? props.theme.red : props.theme.white.darker};
+	position: relative;
+	right: 30px;
+	top: 30px;
+	cursor: pointer;
+`;
+
+const CoverHeader = styled.div`
+	position: relative;
+	top: -130px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+`;
+
+const CoverTitle = styled.div``;
+
 interface IInfoBox {
+	sectionId: number;
 	sectionName: string;
 }
 
-const InfoBox = ({ sectionName }: IInfoBox) => {
-	const [section, setSection] = useRecoilState(sectionState);
-	const sectionId = section[1];
+const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
+	const [favMovies, setIsLike] = useRecoilState(favState);
+	const setSection = useSetRecoilState(sectionState);
 	const queryClient = useQueryClient();
-	const data = queryClient.getQueryData<IGetMovieResult>(sectionName);
-	const clickedTab = data?.results.find(
-		(data) => String(data.id) === String(sectionId)
+	const movies =
+		sectionName === "favs"
+			? favMovies
+			: queryClient.getQueryData<IGetMovieResult>(sectionName)?.results;
+	const clickedTab = movies?.find(
+		(movie) => String(movie.id) === String(sectionId)
 	);
 	const onOverlayClick = () => {
-		setSection(["", 0]);
+		setSection({ sectionId: 0, sectionName: "" });
+	};
+	const favMovie = favMovies?.find(
+		(movie) => String(movie.id) === String(sectionId)
+	);
+	const onFavClick = () => {
+		setIsLike((oldFavMovies) => {
+			if (!clickedTab) return oldFavMovies; // undefined return 방지
+			const favMoviesCopy = [...oldFavMovies];
+			if (
+				favMoviesCopy.findIndex(
+					(movie) => String(movie.id) === String(clickedTab.id)
+				) === -1
+			) {
+				return [
+					...favMoviesCopy,
+					{
+						...clickedTab,
+						isLike: true,
+					},
+				];
+			} else {
+				const targetIndex = oldFavMovies.findIndex(
+					(movie) => String(movie.id) === String(clickedTab.id)
+				);
+				const oldFavMovie = favMoviesCopy[targetIndex];
+				favMoviesCopy.splice(targetIndex, 1);
+				const newFavMoive = {
+					...oldFavMovie,
+					isLike: !oldFavMovie.isLike,
+				};
+				favMoviesCopy.splice(targetIndex, 0, newFavMoive);
+				console.log(favMoviesCopy);
+				return favMoviesCopy.filter((movie) => movie.isLike);
+			}
+		});
 	};
 	const { scrollY } = useViewportScroll();
 	return (
@@ -93,14 +154,36 @@ const InfoBox = ({ sectionName }: IInfoBox) => {
 								<BigCover
 									style={{
 										backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0)), url(
-														${makeImagePath(clickedTab.backdrop_path, "w500")}
+														${makeImagePath(clickedTab?.backdrop_path, "w500")}
 													)`,
 									}}
 								></BigCover>
-								<BigTitle>
-									{clickedTab.title ?? clickedTab.name}
-								</BigTitle>
-								<PlayBtn>Play</PlayBtn>
+								<CoverHeader>
+									<CoverTitle>
+										<BigTitle>
+											{clickedTab.title ??
+												clickedTab.name}
+										</BigTitle>
+										<PlayBtn>Play</PlayBtn>
+									</CoverTitle>
+									<FavBtn
+										isLike={favMovie?.isLike}
+										onClick={onFavClick}
+									>
+										<svg
+											className="w-6 h-6"
+											fill="currentColor"
+											viewBox="0 0 20 20"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												fillRule="evenodd"
+												d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+												clipRule="evenodd"
+											></path>
+										</svg>
+									</FavBtn>
+								</CoverHeader>
 								<BigOverview>{clickedTab.overview}</BigOverview>
 							</>
 						)}

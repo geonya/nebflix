@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
+import { useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { getNowPlayingMovies, getTopRatedMovies } from "../api";
@@ -12,11 +14,16 @@ const Wrapper = styled.div`
 `;
 
 function Home() {
-	const [sectionName, _] = useRecoilValue(sectionState);
+	const { sectionId, sectionName } = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } =
 		useQuery<IGetMovieResult>(["nowPlayingMovies"], getNowPlayingMovies);
 	const { data: topRatedData, isLoading: topRatedLoading } =
 		useQuery<IGetMovieResult>(["topRatedMovies"], getTopRatedMovies);
+	//page enter scroll top
+	const { pathname } = useLocation();
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
@@ -42,7 +49,9 @@ function Home() {
 					sectionName="topRatedMovies"
 				/>
 			)}
-			{sectionName ? <InfoBox sectionName={sectionName + ""} /> : null}
+			{sectionName ? (
+				<InfoBox sectionId={sectionId} sectionName={sectionName} />
+			) : null}
 		</Wrapper>
 	);
 }

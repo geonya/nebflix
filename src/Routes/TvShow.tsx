@@ -6,13 +6,15 @@ import InfoBox from "../Components/InfoBox";
 import Sliders from "../Components/Sliders";
 import Banner from "../Components/Banner";
 import { sectionState } from "../atoms";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Wrapper = styled.div`
 	overflow-x: hidden;
 `;
 
 function TvShow() {
-	const [sectionName, _] = useRecoilValue(sectionState);
+	const { sectionId, sectionName } = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } = useQuery(
 		["nowPlayingTvShows"],
 		getNowPlayingTvShows
@@ -21,7 +23,11 @@ function TvShow() {
 		["topRatedTvShows"],
 		getTopRatedTvShows
 	);
-
+	//page enter scroll top
+	const { pathname } = useLocation();
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
@@ -47,7 +53,9 @@ function TvShow() {
 					sectionName="topRatedTvShows"
 				/>
 			)}
-			{sectionName ? <InfoBox sectionName={sectionName + ""} /> : null}
+			{sectionName ? (
+				<InfoBox sectionId={sectionId} sectionName={sectionName} />
+			) : null}
 		</Wrapper>
 	);
 }

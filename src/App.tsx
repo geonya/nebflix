@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./Components/Header";
+import Fav from "./Routes/Favorites";
 import Home from "./Routes/Home";
 import Search from "./Routes/Search";
 import TvShow from "./Routes/TvShow";
@@ -19,6 +20,7 @@ function App() {
 					<Route path="movies/:id"></Route>
 					<Route path="tvshows/:id"></Route>
 				</Route>
+				<Route path="/favs" element={<Fav />}></Route>
 			</Routes>
 		</BrowserRouter>
 	);

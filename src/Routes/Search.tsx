@@ -1,7 +1,8 @@
 import { motion, Variants } from "framer-motion";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { findMovies, findTvShows } from "../api";
 import { IGetMovieResult, sectionState } from "../atoms";
@@ -24,6 +25,7 @@ const SearchTable = styled.div`
 const TableTitle = styled.h1`
 	font-size: 25px;
 	font-weight: 800;
+	margin-left: 25px;
 	margin-bottom: 20px;
 `;
 const Box = styled(motion.div)<{ bgphoto: string }>`
@@ -87,7 +89,8 @@ interface IClickedBox {
 }
 
 function Search() {
-	const [section, setSection] = useRecoilState(sectionState);
+	const [{ sectionId, sectionName }, setSection] =
+		useRecoilState(sectionState);
 	const [searchParams] = useSearchParams();
 	const keyword = searchParams.get("keyword");
 	const { data: movies, isLoading: isMovieLoading } =
@@ -97,8 +100,13 @@ function Search() {
 		() => findTvShows(keyword)
 	);
 	const onBoxClicked = ({ sectionName, sectionId }: IClickedBox) => {
-		setSection([sectionName, sectionId]);
+		setSection({ sectionId, sectionName });
 	};
+	//page enter scroll top
+	const { pathname } = useLocation();
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 
 	return (
 		<Wrapper>
@@ -176,8 +184,8 @@ function Search() {
 					))}
 				</SearchTable>
 			) : null}
-			{section[0] !== "" ? (
-				<InfoBox sectionName={section[0] + ""} />
+			{sectionName ? (
+				<InfoBox sectionId={sectionId} sectionName={sectionName} />
 			) : null}
 		</Wrapper>
 	);

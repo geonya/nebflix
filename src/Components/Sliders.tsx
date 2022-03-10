@@ -1,10 +1,8 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { useSetRecoilState } from "recoil";
-
 import styled, { useTheme } from "styled-components";
 import { IGetMovieResult, sectionState } from "../atoms";
-
 import { makeImagePath } from "../utils";
 
 const Slider = styled.div`
@@ -142,7 +140,7 @@ const Sliders = ({ title, data, sectionName }: IData) => {
 	};
 	const toggleSliding = () => setSliding((prev) => !prev);
 	const onBoxClicked = (movieId: number) => {
-		setSection([sectionName, movieId]);
+		setSection({ sectionId: movieId, sectionName });
 	};
 	const theme = useTheme();
 	return (
