@@ -2,12 +2,13 @@ import { useQuery } from "react-query";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
+	getMovieVideos,
 	getNowPlayingMovies,
 	getPopularMovies,
 	getTopRatedMovies,
 	getUpcomingMovies,
 } from "../api";
-import { IGetMovieResult, sectionState } from "../atoms";
+import { IGetMovieResult, IGetVideoResult, sectionState } from "../atoms";
 import Banner from "../Components/Banner";
 import InfoBox from "../Components/InfoBox";
 import Sliders from "../Components/Sliders";
@@ -26,13 +27,22 @@ function Home() {
 		useQuery<IGetMovieResult>(["topRatedMovies"], getTopRatedMovies);
 	const { data: upcomingData, isLoading: upcomingLoading } =
 		useQuery<IGetMovieResult>(["upcomingMovies"], getUpcomingMovies);
-
+	const { data: videos, isLoading: videoLoading } = useQuery<IGetVideoResult>(
+		["video"],
+		() => getMovieVideos(nowPlayingData?.results[0]?.id)
+	);
+	const videoKey = videos?.results?.filter(
+		(result) => result.type === "Trailer"
+	)[0].key;
 	return (
 		<Wrapper>
-			{nowPlayingLoading ? (
+			{videoLoading || nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movie={nowPlayingData?.results[0]} />
+				<Banner
+					movie={nowPlayingData?.results[0]}
+					videoKey={videoKey}
+				/>
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>

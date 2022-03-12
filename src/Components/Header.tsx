@@ -237,17 +237,18 @@ function Header() {
 				<ITems>
 					<Item>
 						<Link to="/">
-							Home {homeMatch && <Circle layoutId="circle" />}
+							홈 {homeMatch && <Circle layoutId="circle" />}
 						</Link>
 					</Item>
 					<Item>
 						<Link to="/tvshows">
-							TV Shows {tvMatch && <Circle layoutId="circle" />}
+							시리즈 {tvMatch && <Circle layoutId="circle" />}
 						</Link>
 					</Item>
 					<Item>
 						<Link to="/favs">
-							Favorites {favMatch && <Circle layoutId="circle" />}
+							내가 찜한 콘텐츠
+							{favMatch && <Circle layoutId="circle" />}
 						</Link>
 					</Item>
 				</ITems>

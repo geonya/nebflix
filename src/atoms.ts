@@ -21,6 +21,18 @@ export interface IGetMovieResult {
 	total_results: number;
 }
 
+export interface IVideo {
+	name: string;
+	id: string;
+	key: string;
+	type: string;
+}
+
+export interface IGetVideoResult {
+	id: number;
+	results: IVideo[];
+}
+
 interface ISection {
 	sectionId: number;
 	sectionName: string;

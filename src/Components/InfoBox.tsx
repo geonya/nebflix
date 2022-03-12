@@ -1,4 +1,5 @@
 import { AnimatePresence, motion, useViewportScroll } from "framer-motion";
+import { useState } from "react";
 import { useQueryClient } from "react-query";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import styled from "styled-components";
@@ -71,6 +72,19 @@ const FavBtn = styled(motion.button)<{ islike?: string }>`
 	cursor: pointer;
 `;
 
+const FavInfo = styled(motion.div)`
+	width: 80px;
+	height: 30px;
+	background-color: rgba(0, 0, 0, 0.8);
+	position: absolute;
+	border-radius: 10px;
+	top: 32px;
+	right: 9px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+`;
+
 const CoverHeader = styled.div`
 	position: relative;
 	top: -130px;
@@ -105,6 +119,9 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 		(movie) => String(movie.id) === String(sectionId)
 	);
 	const onFavClick = () => {
+		if (sectionName === "favs") {
+			setSection({ sectionId: 0, sectionName: "" });
+		}
 		setIsLike((oldFavMovies) => {
 			if (!clickedTab) return oldFavMovies; // undefined return 방지
 			const favMoviesCopy = [...oldFavMovies];
@@ -136,6 +153,13 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 		});
 	};
 	const { scrollY } = useViewportScroll();
+	const [favHovering, setFavHovering] = useState(false);
+	const onFavHoverStart = () => {
+		setFavHovering(true);
+	};
+	const onFavHoverEnd = () => {
+		setFavHovering(false);
+	};
 	return (
 		<AnimatePresence>
 			{sectionId ? (
@@ -168,6 +192,8 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 										<PlayBtn>Play</PlayBtn>
 									</CoverTitle>
 									<FavBtn
+										onHoverStart={onFavHoverStart}
+										onHoverEnd={onFavHoverEnd}
 										islike={`${favMovie?.isLike}`}
 										onClick={onFavClick}
 									>
@@ -184,6 +210,11 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 											></path>
 										</svg>
 									</FavBtn>
+									{favHovering ? (
+										<FavInfo>
+											<span>찜하기</span>
+										</FavInfo>
+									) : null}
 								</CoverHeader>
 								<BigOverview>{clickedTab.overview}</BigOverview>
 							</>

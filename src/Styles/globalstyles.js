@@ -54,7 +54,6 @@ body {
   background-color:${(props) => props.theme.black.darker};
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color:${(props) => props.theme.white.lighter};
-  font-weight: 300;
   line-height:1.2;
 }
 a {
