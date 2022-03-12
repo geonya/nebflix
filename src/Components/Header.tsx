@@ -6,11 +6,11 @@ import {
 } from "framer-motion";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useMatch, useNavigate } from "react-router-dom";
+import { Link, useLocation, useMatch, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.div)`
-	z-index: 1000;
+	z-index: 500;
 	position: fixed;
 	top: 0;
 	width: 100%;
@@ -85,6 +85,68 @@ const Input = styled(motion.input)`
 	border: 0.1px solid ${(props) => props.theme.white.lighter};
 `;
 
+const ProfileBtn = styled(motion.div)`
+	cursor: pointer;
+	margin-left: 50px;
+	width: 50px;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: ${(props) => props.theme.white.lighter};
+	a {
+		height: 35px;
+		img {
+			border-radius: 5px;
+			width: 35px;
+			height: 35px;
+		}
+	}
+	span {
+		margin-left: 15px;
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 5px 5px 0 5px;
+		border-color: #fff transparent transparent transparent;
+	}
+`;
+
+const ProfileMenu = styled(motion.div)`
+	position: absolute;
+	top: 40px;
+	right: 42px;
+	section {
+		position: relative;
+		top: 30px;
+		width: 150px;
+		height: 220px;
+		background-color: rgba(0, 0, 0, 0.8);
+		border-radius: 5px;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: space-around;
+		padding: 10px 15px;
+		a {
+			width: 100%;
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			img {
+				border-radius: 5px;
+				width: 35px;
+				height: 35px;
+			}
+			span {
+				font-size: 15px;
+				font-weight: 600;
+				margin-left: 15px;
+			}
+		}
+	}
+`;
+
 const navVariants: Variants = {
 	top: {
 		background:
@@ -97,24 +159,34 @@ const navVariants: Variants = {
 	},
 };
 
+const profileArrowVariants: Variants = {
+	initial: { rotateZ: 0 },
+	animate: (profileHovering: boolean) => ({
+		rotateZ: profileHovering ? 180 : 0,
+	}),
+	exit: { rotateZ: 0 },
+};
+
 interface IForm {
 	keyword: string;
 }
 
 function Header() {
+	const [profileHovering, setProfileHovering] = useState(false);
 	const homeMatch = useMatch("/");
 	const tvMatch = useMatch("/tvshows");
 	const favMatch = useMatch("/favs");
 	const navAnimation = useAnimation();
 	const inputAnimation = useAnimation();
 	const { scrollY } = useViewportScroll();
-	const { register, handleSubmit } = useForm<IForm>();
+	const { register, handleSubmit, setFocus } = useForm<IForm>();
 	const [searchOpen, setSearchOpen] = useState(false);
 	const navigate = useNavigate();
 	const onValid = ({ keyword }: IForm) => {
 		navigate(`/search?keyword=${keyword}`);
 	};
 	const toggleSearch = () => {
+		setFocus("keyword");
 		searchOpen
 			? inputAnimation.start({
 					scaleX: 0,
@@ -122,9 +194,15 @@ function Header() {
 			: inputAnimation.start({
 					scaleX: 1,
 			  });
-
 		setSearchOpen((prev) => !prev);
 	};
+	const onProfileHoverStart = () => {
+		setProfileHovering(true);
+	};
+	const onProfileHoverEnd = () => {
+		setProfileHovering(false);
+	};
+
 	useEffect(() => {
 		scrollY.onChange(() =>
 			scrollY.get() > 80
@@ -132,6 +210,11 @@ function Header() {
 				: navAnimation.start("top")
 		);
 	}, [scrollY, navAnimation]);
+	//page enter scroll top
+	const { pathname } = useLocation();
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 	return (
 		<Nav variants={navVariants} initial="top" animate={navAnimation}>
 			<Col>
@@ -170,9 +253,9 @@ function Header() {
 				</ITems>
 			</Col>
 			<Col>
-				<Search onSubmit={handleSubmit(onValid)}>
+				<Search onSubmit={handleSubmit(onValid)} onClick={toggleSearch}>
 					<motion.svg
-						onClick={toggleSearch}
+						style={{ cursor: "pointer" }}
 						animate={{
 							x: searchOpen ? -185 : 0,
 						}}
@@ -191,6 +274,7 @@ function Header() {
 						{...register("keyword", {
 							required: true,
 							minLength: 2,
+							onBlur: () => searchOpen && toggleSearch(),
 						})}
 						animate={inputAnimation}
 						initial={{ scaleX: 0 }}
@@ -199,6 +283,94 @@ function Header() {
 						autoComplete="off"
 					/>
 				</Search>
+				<ProfileBtn
+					custom={profileHovering}
+					onHoverStart={onProfileHoverStart}
+					onHoverEnd={onProfileHoverEnd}
+				>
+					<a
+						href="https://github.com/geonya"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<img
+							src="https://avatars.githubusercontent.com/u/39020648?v=4"
+							alt="profile-avatar"
+						/>
+					</a>
+					<motion.span
+						transition={{ type: "tween" }}
+						custom={profileHovering}
+						variants={profileArrowVariants}
+						initial="initial"
+						animate="animate"
+						exit="exit"
+						role="presentation"
+					></motion.span>
+				</ProfileBtn>
+				{profileHovering ? (
+					<ProfileMenu
+						onHoverStart={onProfileHoverStart}
+						onHoverEnd={onProfileHoverEnd}
+					>
+						<section>
+							<div>
+								<a
+									href="https://github.com/geonya"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<img
+										src="https://avatars.githubusercontent.com/u/39020648?v=4"
+										alt="profile-avatar"
+									/>
+
+									<span>Geony</span>
+								</a>
+							</div>
+							<div>
+								<a
+									href="https://github.com/geonya"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<img
+										src="https://occ-0-4796-993.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABRPKfs177BiQ9YtqkOYpH3JplmNJ4TsojR5D_rNvQtAPCPBxGAeLaWDMJpaPTA-D-5uXJ6pkCbeMjTr7h5HAO_4.png?r=02c"
+										alt="profile-avatar"
+									/>
+
+									<span>Bora</span>
+								</a>
+							</div>
+							<div>
+								<a
+									href="https://nomadcoders.co"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<img
+										src="https://avatars.githubusercontent.com/u/3612017?v=4"
+										alt="profile-avatar"
+									/>
+									<span>Nico</span>
+								</a>
+							</div>
+							<div>
+								<a
+									href="https://nomadcoders.co"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<img
+										src="https://d1telmomo28umc.cloudfront.net/media/public/avatars/lynn-1608029862.jpg"
+										alt="profile-avatar"
+									/>
+									<span>Lynn</span>
+								</a>
+							</div>
+						</section>
+					</ProfileMenu>
+				) : null}
 			</Col>
 		</Nav>
 	);

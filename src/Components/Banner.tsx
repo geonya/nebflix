@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { IGetMovieResult } from "../atoms";
-
+import { IMovie } from "../atoms";
 import { makeImagePath } from "../utils";
 
 const Main = styled.div<{ bgphoto: string }>`
@@ -24,14 +23,13 @@ const Overview = styled.p`
 	width: 50%;
 `;
 interface IBanner {
-	movies?: IGetMovieResult;
+	movie?: IMovie;
 }
-const Banner = (data: IBanner) => {
-	const { movies }: IBanner = data;
+const Banner = ({ movie }: IBanner) => {
 	return (
-		<Main bgphoto={makeImagePath(movies?.results[0].backdrop_path || "")}>
-			<Title>{movies?.results[0].title || movies?.results[0].name}</Title>
-			<Overview>{movies?.results[0].overview}</Overview>
+		<Main bgphoto={makeImagePath(movie?.backdrop_path || "")}>
+			<Title>{movie?.title || movie?.name}</Title>
+			<Overview>{movie?.overview}</Overview>
 		</Main>
 	);
 };

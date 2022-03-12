@@ -1,9 +1,12 @@
-import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { getNowPlayingMovies, getTopRatedMovies } from "../api";
+import {
+	getNowPlayingMovies,
+	getPopularMovies,
+	getTopRatedMovies,
+	getUpcomingMovies,
+} from "../api";
 import { IGetMovieResult, sectionState } from "../atoms";
 import Banner from "../Components/Banner";
 import InfoBox from "../Components/InfoBox";
@@ -17,27 +20,36 @@ function Home() {
 	const { sectionId, sectionName } = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } =
 		useQuery<IGetMovieResult>(["nowPlayingMovies"], getNowPlayingMovies);
+	const { data: popularData, isLoading: popularLoading } =
+		useQuery<IGetMovieResult>(["popularMovies"], getPopularMovies);
 	const { data: topRatedData, isLoading: topRatedLoading } =
 		useQuery<IGetMovieResult>(["topRatedMovies"], getTopRatedMovies);
-	//page enter scroll top
-	const { pathname } = useLocation();
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
+	const { data: upcomingData, isLoading: upcomingLoading } =
+		useQuery<IGetMovieResult>(["upcomingMovies"], getUpcomingMovies);
+
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movies={nowPlayingData} />
+				<Banner movie={nowPlayingData?.results[0]} />
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
 				<Sliders
-					title="최신 영화"
-					data={nowPlayingData}
+					title="지금 상영 중"
+					movies={nowPlayingData?.results}
 					sectionName="nowPlayingMovies"
+				/>
+			)}
+			{popularLoading ? (
+				<span>Loading...</span>
+			) : (
+				<Sliders
+					title="인기 영화"
+					movies={popularData?.results}
+					sectionName="popularMovies"
 				/>
 			)}
 			{topRatedLoading ? (
@@ -45,8 +57,17 @@ function Home() {
 			) : (
 				<Sliders
 					title="명작 영화"
-					data={topRatedData}
+					movies={topRatedData?.results}
 					sectionName="topRatedMovies"
+				/>
+			)}
+			{upcomingLoading ? (
+				<span>Loading...</span>
+			) : (
+				<Sliders
+					title="개봉 예정"
+					movies={upcomingData?.results}
+					sectionName="upcomingMovies"
 				/>
 			)}
 			{sectionName ? (

@@ -1,15 +1,14 @@
-import { motion, Variants } from "framer-motion";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { favState, sectionState } from "../atoms";
 import InfoBox from "../Components/InfoBox";
 import { makeImagePath } from "../utils";
+import { motion, Variants } from "framer-motion";
 
 const Wrapper = styled.div`
 	margin-top: 150px;
 	width: 100%;
+	height: 100%;
 `;
 
 const FavsTable = styled.div`
@@ -89,50 +88,51 @@ interface IClickedBox {
 function Fav() {
 	const [{ sectionId, sectionName }, setSection] =
 		useRecoilState(sectionState);
-	const [favMovies, setIsLike] = useRecoilState(favState);
+	const favMovies = useRecoilValue(favState);
 	const onBoxClicked = ({ sectionName, sectionId }: IClickedBox) => {
 		setSection({ sectionId, sectionName });
 	};
-	//page enter scroll top
-	const { pathname } = useLocation();
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
 	return (
 		<Wrapper>
-			<TableTitle>Favorites</TableTitle>
-			<FavsTable>
-				{favMovies?.map((movie) => (
-					<Box
-						key={movie.id}
-						variants={boxVariants}
-						layoutId={movie.id + ""}
-						initial="normal"
-						whileHover="hover"
-						transition={{ type: "tween" }}
-						bgphoto={makeImagePath(
-							movie.backdrop_path ?? movie.poster_path,
-							"w500"
-						)}
-						onClick={() =>
-							onBoxClicked({
-								sectionName: "favs",
-								sectionId: movie.id,
-							})
-						}
-					>
-						<Info variants={infoVariants}>
-							<motion.h4>{movie.name || movie.title}</motion.h4>
-							<motion.svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 512 512"
-							>
-								<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
-							</motion.svg>
-						</Info>
-					</Box>
-				))}
-			</FavsTable>
+			<TableTitle>즐겨찾기</TableTitle>
+			{favMovies !== [] ? (
+				<FavsTable>
+					{favMovies?.map((movie) => (
+						<Box
+							key={movie.id}
+							variants={boxVariants}
+							layoutId={"favs" + movie.id}
+							initial="normal"
+							whileHover="hover"
+							transition={{ type: "tween" }}
+							bgphoto={makeImagePath(
+								movie.backdrop_path ?? movie.poster_path,
+								"w500"
+							)}
+							onClick={() =>
+								onBoxClicked({
+									sectionName: "favs",
+									sectionId: movie.id,
+								})
+							}
+						>
+							<Info variants={infoVariants}>
+								<motion.h4>
+									{movie.name || movie.title}
+								</motion.h4>
+								<motion.svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 512 512"
+								>
+									<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
+								</motion.svg>
+							</Info>
+						</Box>
+					))}
+				</FavsTable>
+			) : (
+				"Loading..."
+			)}
 			{sectionName ? (
 				<InfoBox sectionId={sectionId} sectionName={sectionName} />
 			) : null}

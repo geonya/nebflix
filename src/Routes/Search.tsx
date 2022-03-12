@@ -1,7 +1,6 @@
 import { motion, Variants } from "framer-motion";
-import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { findMovies, findTvShows } from "../api";
@@ -94,19 +93,16 @@ function Search() {
 	const [searchParams] = useSearchParams();
 	const keyword = searchParams.get("keyword");
 	const { data: movies, isLoading: isMovieLoading } =
-		useQuery<IGetMovieResult>("searchedMovies", () => findMovies(keyword));
+		useQuery<IGetMovieResult>(keyword + "movies", () =>
+			findMovies(keyword)
+		);
 	const { data: tvShows, isLoading: isTvLoading } = useQuery<IGetMovieResult>(
-		"searchedTvShows",
+		keyword + "tvShows",
 		() => findTvShows(keyword)
 	);
 	const onBoxClicked = ({ sectionName, sectionId }: IClickedBox) => {
 		setSection({ sectionId, sectionName });
 	};
-	//page enter scroll top
-	const { pathname } = useLocation();
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
 
 	return (
 		<Wrapper>
@@ -117,7 +113,7 @@ function Search() {
 						<Box
 							key={movie.id}
 							variants={boxVariants}
-							layoutId={movie.id + ""}
+							layoutId={keyword + "movies" + movie.id}
 							initial="normal"
 							whileHover="hover"
 							transition={{ type: "tween" }}
@@ -127,7 +123,7 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									sectionName: "searchedMovies",
+									sectionName: keyword + "movies",
 									sectionId: movie.id,
 								})
 							}
@@ -154,7 +150,7 @@ function Search() {
 						<Box
 							key={movie.id}
 							variants={boxVariants}
-							layoutId={movie.id + ""}
+							layoutId={keyword + "tvShows" + movie.id}
 							initial="normal"
 							whileHover="hover"
 							transition={{ type: "tween" }}
@@ -164,7 +160,7 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									sectionName: "searchedTvShows",
+									sectionName: keyword + "tvShows",
 									sectionId: movie.id,
 								})
 							}

@@ -2,7 +2,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import styled, { useTheme } from "styled-components";
-import { IGetMovieResult, sectionState } from "../atoms";
+import { IMovie, sectionState } from "../atoms";
 import { makeImagePath } from "../utils";
 
 const Slider = styled.div`
@@ -120,20 +120,20 @@ const offSet = 6;
 interface IData {
 	title: string;
 	sectionName: string;
-	data?: IGetMovieResult;
+	movies?: IMovie[];
 }
 
-const Sliders = ({ title, data, sectionName }: IData) => {
+const Sliders = ({ title, movies, sectionName }: IData) => {
 	const setSection = useSetRecoilState(sectionState);
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
 	const [index, setIndex] = useState(0);
 	const [sliding, setSliding] = useState(false);
 	const nextSlide = () => {
 		if (sliding) return;
-		if (data) {
+		if (movies) {
 			toggleSliding();
 			setFirstLoad(false);
-			const totalResults = data?.results.length - 1;
+			const totalResults = movies?.length - 1;
 			const maxIndex = Math.floor(totalResults / offSet) - 1;
 			setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
 		}
@@ -155,14 +155,14 @@ const Sliders = ({ title, data, sectionName }: IData) => {
 					transition={{ type: "tween", duration: 1 }}
 					key={index}
 				>
-					{data?.results
-						.slice(1)
+					{movies
+						?.slice(1)
 						.slice(index * offSet, (index + 1) * offSet)
 						.map((movie) => (
 							<Box
 								key={movie.id}
 								variants={boxVariants}
-								layoutId={movie.id + ""}
+								layoutId={sectionName + movie.id}
 								initial="normal"
 								whileHover="hover"
 								transition={{ type: "tween" }}

@@ -6,6 +6,7 @@ import { favState, IGetMovieResult, sectionState } from "../atoms";
 import { makeImagePath } from "../utils";
 
 const BigMovie = styled(motion.div)`
+	z-index: 900;
 	background-color: ${(props) => props.theme.black.darker};
 	position: absolute;
 	width: 40vw;
@@ -48,6 +49,7 @@ const BigOverview = styled(motion.p)`
 `;
 
 const Overlay = styled(motion.div)`
+	z-index: 700;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -57,12 +59,12 @@ const Overlay = styled(motion.div)`
 	opacity: 0;
 `;
 
-const FavBtn = styled(motion.button)<{ isLike?: boolean }>`
+const FavBtn = styled(motion.button)<{ islike?: string }>`
 	all: unset;
 	width: 30px;
 	height: 30px;
 	color: ${(props) =>
-		props.isLike ? props.theme.red : props.theme.white.darker};
+		props.islike === "true" ? props.theme.red : props.theme.white.darker};
 	position: relative;
 	right: 30px;
 	top: 30px;
@@ -129,7 +131,6 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 					isLike: !oldFavMovie.isLike,
 				};
 				favMoviesCopy.splice(targetIndex, 0, newFavMoive);
-				console.log(favMoviesCopy);
 				return favMoviesCopy.filter((movie) => movie.isLike);
 			}
 		});
@@ -146,7 +147,7 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 					/>
 
 					<BigMovie
-						layoutId={sectionId + ""}
+						layoutId={sectionName + sectionId}
 						style={{ top: scrollY.get() + 100 }}
 					>
 						{clickedTab && (
@@ -167,7 +168,7 @@ const InfoBox = ({ sectionId, sectionName }: IInfoBox) => {
 										<PlayBtn>Play</PlayBtn>
 									</CoverTitle>
 									<FavBtn
-										isLike={favMovie?.isLike}
+										islike={`${favMovie?.isLike}`}
 										onClick={onFavClick}
 									>
 										<svg

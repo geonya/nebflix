@@ -1,13 +1,16 @@
 import { useQuery } from "react-query";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { getNowPlayingTvShows, getTopRatedTvShows } from "../api";
+import {
+	getAiringTvShows,
+	getNowPlayingTvShows,
+	getPopularTvShows,
+	getTopRatedTvShows,
+} from "../api";
 import InfoBox from "../Components/InfoBox";
 import Sliders from "../Components/Sliders";
 import Banner from "../Components/Banner";
 import { sectionState } from "../atoms";
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
 
 const Wrapper = styled.div`
 	overflow-x: hidden;
@@ -15,41 +18,63 @@ const Wrapper = styled.div`
 
 function TvShow() {
 	const { sectionId, sectionName } = useRecoilValue(sectionState);
+	const { data: airingData, isLoading: airingLoading } = useQuery(
+		["airingTvShows"],
+		getAiringTvShows
+	);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } = useQuery(
 		["nowPlayingTvShows"],
 		getNowPlayingTvShows
+	);
+	const { data: popularData, isLoading: popularLoading } = useQuery(
+		["popularTvShows"],
+		getPopularTvShows
 	);
 	const { data: topRatedData, isLoading: topRatedLoading } = useQuery(
 		["topRatedTvShows"],
 		getTopRatedTvShows
 	);
-	//page enter scroll top
-	const { pathname } = useLocation();
-	useEffect(() => {
-		window.scrollTo(0, 0);
-	}, [pathname]);
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movies={nowPlayingData} />
+				<Banner movie={nowPlayingData?.results[0]} />
 			)}
+			{airingLoading ? (
+				<span>Loading...</span>
+			) : (
+				<Sliders
+					title="지금 방영 중"
+					movies={airingData?.results}
+					sectionName="airingTvShows"
+				/>
+			)}
+
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
 				<Sliders
-					title="최신 시리즈"
-					data={nowPlayingData}
+					title="최신 드라마"
+					movies={nowPlayingData?.results}
 					sectionName="nowPlayingTvShows"
+				/>
+			)}
+			{popularLoading ? (
+				<span>Loading...</span>
+			) : (
+				<Sliders
+					title="지금 뜨는 콘텐츠"
+					movies={popularData?.results}
+					sectionName="popularTvShows"
 				/>
 			)}
 			{topRatedLoading ? (
 				<span>Loading...</span>
 			) : (
 				<Sliders
-					title="명작 시리즈"
-					data={topRatedData}
+					title="인기 드라마"
+					movies={topRatedData?.results}
 					sectionName="topRatedTvShows"
 				/>
 			)}

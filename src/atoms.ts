@@ -31,17 +31,20 @@ export const sectionState = atom<ISection>({
 	default: { sectionId: 0, sectionName: "" },
 });
 
+const localStorageEffects =
+	(key: string) =>
+	({ setSelf, onSet }: any) => {
+		const savedFavs = localStorage.getItem(key);
+		if (savedFavs != null) {
+			setSelf(JSON.parse(savedFavs));
+		}
+		onSet((favs: IMovie[]) =>
+			localStorage.setItem(key, JSON.stringify(favs))
+		);
+	};
+
 export const favState = atom<IMovie[]>({
 	key: "favs",
-	default: [
-		{
-			backdrop_path: "/9OYu6oDLIidSOocW3JTGtd2Oyqy.jpg",
-			id: 71712,
-			name: "The Good Doctor",
-			overview:
-				"Shaun Murphy, a young surgeon with autism and savant syndrome, relocates from a quiet country life to join a prestigious hospital's surgical unit. Unable to personally connect with those around him, Shaun uses his extraordinary medical gifts to save lives and challenge the skepticism of his colleagues.",
-			poster_path: "/cXUqtadGsIcZDWUTrfnbDjAy8eN.jpg",
-			isLike: true,
-		},
-	],
+	default: [],
+	effects: [localStorageEffects("favs")],
 });
