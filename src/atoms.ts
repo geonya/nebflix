@@ -8,6 +8,10 @@ export interface IMovie {
 	poster_path: string;
 	backdrop_path: string;
 	isLike?: boolean;
+	genres?: { name: string }[];
+	first_air_date?: string;
+	release_date?: string;
+	vote_average?: number;
 }
 
 export interface IGetMovieResult {
@@ -33,14 +37,15 @@ export interface IGetVideoResult {
 	results: IVideo[];
 }
 
-interface ISection {
-	sectionId: number;
-	sectionName: string;
+export interface ISection {
+	id?: number;
+	part: string | null;
+	query?: string;
 }
 
 export const sectionState = atom<ISection>({
 	key: "section",
-	default: { sectionId: 0, sectionName: "" },
+	default: { id: 0, part: "", query: "" },
 });
 
 const localStorageEffects =
@@ -59,4 +64,9 @@ export const favState = atom<IMovie[]>({
 	key: "favs",
 	default: [],
 	effects: [localStorageEffects("favs")],
+});
+
+export const videoState = atom({
+	key: "video",
+	default: false,
 });

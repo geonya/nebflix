@@ -17,21 +17,21 @@ const Wrapper = styled.div`
 `;
 
 function TvShow() {
-	const { sectionId, sectionName } = useRecoilValue(sectionState);
+	const { query } = useRecoilValue(sectionState);
 	const { data: airingData, isLoading: airingLoading } = useQuery(
-		["airingTvShows"],
+		["airingData", "tv"],
 		getAiringTvShows
 	);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } = useQuery(
-		["nowPlayingTvShows"],
+		["nowPlayingData", "tv"],
 		getNowPlayingTvShows
 	);
 	const { data: popularData, isLoading: popularLoading } = useQuery(
-		["popularTvShows"],
+		["popularData", "tv"],
 		getPopularTvShows
 	);
 	const { data: topRatedData, isLoading: topRatedLoading } = useQuery(
-		["topRatedTvShows"],
+		["topRatedData", "tv"],
 		getTopRatedTvShows
 	);
 	return (
@@ -39,7 +39,7 @@ function TvShow() {
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movie={nowPlayingData?.results[0]} />
+				<Banner movies={nowPlayingData?.results} part="tv" />
 			)}
 			{airingLoading ? (
 				<span>Loading...</span>
@@ -47,7 +47,8 @@ function TvShow() {
 				<Sliders
 					title="지금 방영 중"
 					movies={airingData?.results}
-					sectionName="airingTvShows"
+					query="airingData"
+					part="tv"
 				/>
 			)}
 
@@ -57,7 +58,8 @@ function TvShow() {
 				<Sliders
 					title="최신 드라마"
 					movies={nowPlayingData?.results}
-					sectionName="nowPlayingTvShows"
+					query="nowPlayingData"
+					part="tv"
 				/>
 			)}
 			{popularLoading ? (
@@ -66,7 +68,8 @@ function TvShow() {
 				<Sliders
 					title="지금 뜨는 콘텐츠"
 					movies={popularData?.results}
-					sectionName="popularTvShows"
+					query="popularData"
+					part="tv"
 				/>
 			)}
 			{topRatedLoading ? (
@@ -75,12 +78,11 @@ function TvShow() {
 				<Sliders
 					title="인기 드라마"
 					movies={topRatedData?.results}
-					sectionName="topRatedTvShows"
+					query="topRatedData"
+					part="tv"
 				/>
 			)}
-			{sectionName ? (
-				<InfoBox sectionId={sectionId} sectionName={sectionName} />
-			) : null}
+			{query ? <InfoBox /> : null}
 		</Wrapper>
 	);
 }

@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { findMovies, findTvShows } from "../api";
-import { IGetMovieResult, sectionState } from "../atoms";
+import { IGetMovieResult, ISection, sectionState } from "../atoms";
 import InfoBox from "../Components/InfoBox";
 import { makeImagePath } from "../utils";
 
@@ -82,28 +82,21 @@ const boxVariants: Variants = {
 	},
 };
 
-interface IClickedBox {
-	sectionName: string;
-	sectionId: number;
-}
-
 function Search() {
-	const [{ sectionId, sectionName }, setSection] =
-		useRecoilState(sectionState);
+	const [{ query }, setSection] = useRecoilState(sectionState);
 	const [searchParams] = useSearchParams();
 	const keyword = searchParams.get("keyword");
 	const { data: movies, isLoading: isMovieLoading } =
-		useQuery<IGetMovieResult>(keyword + "movies", () =>
+		useQuery<IGetMovieResult>(["searchedMovie", keyword], () =>
 			findMovies(keyword)
 		);
 	const { data: tvShows, isLoading: isTvLoading } = useQuery<IGetMovieResult>(
-		keyword + "tvShows",
+		["searchedTv", keyword],
 		() => findTvShows(keyword)
 	);
-	const onBoxClicked = ({ sectionName, sectionId }: IClickedBox) => {
-		setSection({ sectionId, sectionName });
+	const onBoxClicked = ({ id, query, part }: ISection) => {
+		setSection({ id, query, part });
 	};
-
 	return (
 		<Wrapper>
 			<TableTitle>영화</TableTitle>
@@ -113,7 +106,7 @@ function Search() {
 						<Box
 							key={movie.id}
 							variants={boxVariants}
-							layoutId={keyword + "movies" + movie.id}
+							layoutId={"searchedMovie" + movie.id}
 							initial="normal"
 							whileHover="hover"
 							transition={{ type: "tween" }}
@@ -123,8 +116,9 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									sectionName: keyword + "movies",
-									sectionId: movie.id,
+									part: keyword,
+									id: movie.id,
+									query: "searchedMovie",
 								})
 							}
 						>
@@ -150,7 +144,7 @@ function Search() {
 						<Box
 							key={movie.id}
 							variants={boxVariants}
-							layoutId={keyword + "tvShows" + movie.id}
+							layoutId={"searchedTv" + movie.id}
 							initial="normal"
 							whileHover="hover"
 							transition={{ type: "tween" }}
@@ -160,8 +154,9 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									sectionName: keyword + "tvShows",
-									sectionId: movie.id,
+									part: keyword,
+									id: movie.id,
+									query: "searchedTv",
 								})
 							}
 						>
@@ -180,9 +175,7 @@ function Search() {
 					))}
 				</SearchTable>
 			) : null}
-			{sectionName ? (
-				<InfoBox sectionId={sectionId} sectionName={sectionName} />
-			) : null}
+			{query ? <InfoBox /> : null}
 		</Wrapper>
 	);
 }

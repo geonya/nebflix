@@ -119,11 +119,12 @@ const offSet = 6;
 
 interface IData {
 	title: string;
-	sectionName: string;
+	query: string;
 	movies?: IMovie[];
+	part: string;
 }
 
-const Sliders = ({ title, movies, sectionName }: IData) => {
+const Sliders = ({ title, movies, query, part }: IData) => {
 	const setSection = useSetRecoilState(sectionState);
 	const [firstLoad, setFirstLoad] = useState(true); // first slider visible set
 	const [index, setIndex] = useState(0);
@@ -140,7 +141,7 @@ const Sliders = ({ title, movies, sectionName }: IData) => {
 	};
 	const toggleSliding = () => setSliding((prev) => !prev);
 	const onBoxClicked = (movieId: number) => {
-		setSection({ sectionId: movieId, sectionName });
+		setSection({ id: movieId, query, part });
 	};
 	const theme = useTheme();
 	return (
@@ -162,7 +163,7 @@ const Sliders = ({ title, movies, sectionName }: IData) => {
 							<Box
 								key={movie.id}
 								variants={boxVariants}
-								layoutId={sectionName + movie.id}
+								layoutId={query + movie.id}
 								initial="normal"
 								whileHover="hover"
 								transition={{ type: "tween" }}

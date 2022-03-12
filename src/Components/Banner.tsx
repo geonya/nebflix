@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+
 import styled from "styled-components";
-import { IMovie } from "../atoms";
+
+import { IMovie, videoState } from "../atoms";
 import { makeImagePath } from "../utils";
+import FavBtn from "./FavBtn";
+import { PlayBtn } from "./PlayBtn";
+import Video from "./Video";
 
 const Main = styled.div<{ bgphoto: string }>`
 	width: 100%;
@@ -8,25 +15,11 @@ const Main = styled.div<{ bgphoto: string }>`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	align-items: flex-start;
 	padding: 60px;
 	background-image: url(${(props) => props.bgphoto});
 	background-size: cover;
 	overflow: hidden;
-`;
-const Video = styled.div`
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 100vw;
-	height: 100vh;
-	transform: translate(-50%, -50%);
-	overflow: hidden;
-	iframe {
-		position: relative;
-		top: -50px;
-		width: 100%;
-		height: 115%;
-	}
 `;
 
 const Title = styled.h1`
@@ -37,31 +30,44 @@ const Title = styled.h1`
 
 const Overview = styled.p`
 	z-index: 200;
-	font-size: 30px;
-	width: 50%;
+	font-size: 20px;
+	width: 40%;
+`;
+
+const Footer = styled.div`
+	z-index: 200;
+	margin-top: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `;
 
 interface IBanner {
-	movie?: IMovie;
-	videoKey?: string;
+	movies?: IMovie[];
+	part: string;
 }
 
-const Banner = ({ movie, videoKey }: IBanner) => {
+const Banner = ({ movies, part }: IBanner) => {
+	const isVideo = useRecoilValue(videoState);
+	const [randomIndex, setRanDomIndex] = useState(0);
+	useEffect(() => {
+		setRanDomIndex(Math.ceil(Math.random() * 20));
+	}, []);
+	const movie = movies ? movies[randomIndex] : null;
 	return (
-		<Main bgphoto={makeImagePath(movie?.backdrop_path || "")}>
-			{videoKey ? (
-				<Video>
-					<iframe
-						src={`https://www.youtube.com/embed/${videoKey}?controls=0?autoplay=1`}
-						title="YouTube video player"
-						frameBorder="0"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					></iframe>
-				</Video>
+		<>
+			{movie ? (
+				<Main bgphoto={makeImagePath(movie?.backdrop_path || "")}>
+					{isVideo ? <Video movie={movie} part={part} /> : null}
+					<Title>{movie?.title || movie?.name}</Title>
+					<Overview>{movie?.overview}</Overview>
+					<Footer>
+						<PlayBtn />
+						<FavBtn id={movie.id} part={part} movie={movie} />
+					</Footer>
+				</Main>
 			) : null}
-			<Title>{movie?.title || movie?.name}</Title>
-			<Overview>{movie?.overview}</Overview>
-		</Main>
+		</>
 	);
 };
 

@@ -1,6 +1,6 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { favState, sectionState } from "../atoms";
+import { favState, ISection, sectionState } from "../atoms";
 import InfoBox from "../Components/InfoBox";
 import { makeImagePath } from "../utils";
 import { motion, Variants } from "framer-motion";
@@ -80,17 +80,11 @@ const boxVariants: Variants = {
 	},
 };
 
-interface IClickedBox {
-	sectionName: string;
-	sectionId: number;
-}
-
 function Fav() {
-	const [{ sectionId, sectionName }, setSection] =
-		useRecoilState(sectionState);
+	const [{ id }, setSection] = useRecoilState(sectionState);
 	const favMovies = useRecoilValue(favState);
-	const onBoxClicked = ({ sectionName, sectionId }: IClickedBox) => {
-		setSection({ sectionId, sectionName });
+	const onBoxClicked = ({ part, id, query }: ISection) => {
+		setSection({ part, id, query });
 	};
 	return (
 		<Wrapper>
@@ -111,8 +105,9 @@ function Fav() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									sectionName: "favs",
-									sectionId: movie.id,
+									part: "favs",
+									id: movie.id,
+									query: "favs",
 								})
 							}
 						>
@@ -133,9 +128,7 @@ function Fav() {
 			) : (
 				"Loading..."
 			)}
-			{sectionName ? (
-				<InfoBox sectionId={sectionId} sectionName={sectionName} />
-			) : null}
+			{id ? <InfoBox /> : null}
 		</Wrapper>
 	);
 }

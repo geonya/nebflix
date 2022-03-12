@@ -2,13 +2,12 @@ import { useQuery } from "react-query";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import {
-	getMovieVideos,
 	getNowPlayingMovies,
 	getPopularMovies,
 	getTopRatedMovies,
 	getUpcomingMovies,
 } from "../api";
-import { IGetMovieResult, IGetVideoResult, sectionState } from "../atoms";
+import { IGetMovieResult, sectionState } from "../atoms";
 import Banner from "../Components/Banner";
 import InfoBox from "../Components/InfoBox";
 import Sliders from "../Components/Sliders";
@@ -18,31 +17,25 @@ const Wrapper = styled.div`
 `;
 
 function Home() {
-	const { sectionId, sectionName } = useRecoilValue(sectionState);
+	const { query } = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } =
-		useQuery<IGetMovieResult>(["nowPlayingMovies"], getNowPlayingMovies);
+		useQuery<IGetMovieResult>(
+			["nowPlayingData", "movie"],
+			getNowPlayingMovies
+		);
 	const { data: popularData, isLoading: popularLoading } =
-		useQuery<IGetMovieResult>(["popularMovies"], getPopularMovies);
+		useQuery<IGetMovieResult>(["popularData", "movie"], getPopularMovies);
 	const { data: topRatedData, isLoading: topRatedLoading } =
-		useQuery<IGetMovieResult>(["topRatedMovies"], getTopRatedMovies);
+		useQuery<IGetMovieResult>(["topRatedData", "movie"], getTopRatedMovies);
 	const { data: upcomingData, isLoading: upcomingLoading } =
-		useQuery<IGetMovieResult>(["upcomingMovies"], getUpcomingMovies);
-	const { data: videos, isLoading: videoLoading } = useQuery<IGetVideoResult>(
-		["video"],
-		() => getMovieVideos(nowPlayingData?.results[0]?.id)
-	);
-	const videoKey = videos?.results?.filter(
-		(result) => result.type === "Trailer"
-	)[0].key;
+		useQuery<IGetMovieResult>(["upcomingData", "movie"], getUpcomingMovies);
+
 	return (
 		<Wrapper>
-			{videoLoading || nowPlayingLoading ? (
+			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner
-					movie={nowPlayingData?.results[0]}
-					videoKey={videoKey}
-				/>
+				<Banner movies={nowPlayingData?.results} part="movie" />
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
@@ -50,7 +43,8 @@ function Home() {
 				<Sliders
 					title="지금 상영 중"
 					movies={nowPlayingData?.results}
-					sectionName="nowPlayingMovies"
+					query="nowPlayingData"
+					part="movie"
 				/>
 			)}
 			{popularLoading ? (
@@ -59,7 +53,8 @@ function Home() {
 				<Sliders
 					title="인기 영화"
 					movies={popularData?.results}
-					sectionName="popularMovies"
+					query="popularData"
+					part="movie"
 				/>
 			)}
 			{topRatedLoading ? (
@@ -68,7 +63,8 @@ function Home() {
 				<Sliders
 					title="명작 영화"
 					movies={topRatedData?.results}
-					sectionName="topRatedMovies"
+					query="topRatedData"
+					part="movie"
 				/>
 			)}
 			{upcomingLoading ? (
@@ -77,12 +73,11 @@ function Home() {
 				<Sliders
 					title="개봉 예정"
 					movies={upcomingData?.results}
-					sectionName="upcomingMovies"
+					query="upcomingData"
+					part="movie"
 				/>
 			)}
-			{sectionName ? (
-				<InfoBox sectionId={sectionId} sectionName={sectionName} />
-			) : null}
+			{query ? <InfoBox /> : null}
 		</Wrapper>
 	);
 }
