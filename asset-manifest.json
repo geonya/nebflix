@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/nebflix/static/js/main.6340caee.js",
+    "main.js": "/nebflix/static/js/main.aa531cb2.js",
     "index.html": "/nebflix/index.html",
-    "main.6340caee.js.map": "/nebflix/static/js/main.6340caee.js.map"
+    "main.aa531cb2.js.map": "/nebflix/static/js/main.aa531cb2.js.map"
   },
   "entrypoints": [
-    "static/js/main.6340caee.js"
+    "static/js/main.aa531cb2.js"
   ]
 }
