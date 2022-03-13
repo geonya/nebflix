@@ -32,10 +32,10 @@ function Home() {
 		useQuery<IGetMovieResult>(["upcomingData", part], getUpcomingMovies);
 	return (
 		<Wrapper>
-			{nowPlayingLoading ? (
+			{popularLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movies={nowPlayingData?.results} part={part} />
+				<Banner movies={popularData?.results} part={part} />
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
