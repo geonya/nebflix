@@ -6,9 +6,10 @@ import { favState, IGetMovieResult, sectionState } from "../atoms";
 import { makeImagePath } from "../utils";
 import FavBtn from "./FavBtn";
 import { PlayBtn } from "./PlayBtn";
+import Video from "./Video";
 
 const CoverBox = styled(motion.div)`
-	z-index: 900;
+	z-index: 500;
 	background-color: ${(props) => props.theme.black.darker};
 	position: absolute;
 	max-width: 800px;
@@ -16,6 +17,7 @@ const CoverBox = styled(motion.div)`
 	left: 0;
 	right: 0;
 	margin: auto auto;
+	overflow: hidden;
 `;
 
 const CoverHeader = styled.div`
@@ -25,9 +27,21 @@ const CoverHeader = styled.div`
 	background-size: cover;
 	background-position: center center;
 	display: flex;
-	justify-content: space-between;
 	align-items: flex-end;
 	width: 100%;
+	overflow: hidden;
+	position: relative;
+	.titleBox {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		z-index: 1;
+	}
+	.video {
+		height: 200%;
+		z-index: 0;
+	}
 `;
 
 const MovieTitle = styled(motion.div)`
@@ -63,7 +77,6 @@ const CoverInfo = styled(motion.div)`
 `;
 
 const Overlay = styled(motion.div)`
-	z-index: 700;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -115,19 +128,29 @@ const InfoBox = () => {
 													)`,
 									}}
 								>
-									<div>
-										<MovieTitle>
-											{selectedMovie.title ??
-												selectedMovie.name}
-										</MovieTitle>
-										<PlayBtn />
+									<div className="titleBox">
+										<div>
+											<MovieTitle>
+												{selectedMovie.title ??
+													selectedMovie.name}
+											</MovieTitle>
+											<PlayBtn />
+										</div>
+										<FavBtn
+											id={selectedMovie.id}
+											part={part || ""}
+											movie={selectedMovie}
+										/>
 									</div>
-									<FavBtn
-										id={selectedMovie.id}
-										part={part || ""}
-										movie={selectedMovie}
-									/>
+									<div className="video">
+										<Video
+											id={selectedMovie.id}
+											part={part}
+											isBanner={false}
+										/>
+									</div>
 								</CoverHeader>
+
 								<CoverInfo>
 									<div>{selectedMovie.overview}</div>
 									<div>

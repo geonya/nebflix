@@ -87,11 +87,11 @@ function Search() {
 	const [searchParams] = useSearchParams();
 	const keyword = searchParams.get("keyword");
 	const { data: movies, isLoading: isMovieLoading } =
-		useQuery<IGetMovieResult>(["searchedMovie", keyword], () =>
+		useQuery<IGetMovieResult>(["searchedMovie", "search"], () =>
 			findMovies(keyword)
 		);
 	const { data: tvShows, isLoading: isTvLoading } = useQuery<IGetMovieResult>(
-		["searchedTv", keyword],
+		["searchedTv", "search"],
 		() => findTvShows(keyword)
 	);
 	const onBoxClicked = ({ id, query, part }: ISection) => {
@@ -116,7 +116,7 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									part: keyword,
+									part: "search",
 									id: movie.id,
 									query: "searchedMovie",
 								})
@@ -154,7 +154,7 @@ function Search() {
 							)}
 							onClick={() =>
 								onBoxClicked({
-									part: keyword,
+									part: "search",
 									id: movie.id,
 									query: "searchedTv",
 								})

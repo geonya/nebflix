@@ -10,7 +10,7 @@ import { Link, useLocation, useMatch, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.div)`
-	z-index: 500;
+	z-index: 999;
 	position: fixed;
 	top: 0;
 	width: 100%;

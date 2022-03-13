@@ -46,12 +46,15 @@ interface IBanner {
 }
 
 const Banner = ({ movies, part }: IBanner) => {
-	const movie = movies ? movies[0] : null;
+	const movie = movies
+		? movies[Math.ceil(Math.random() * (movies.length - 1))]
+		: null;
+
 	return (
 		<>
 			{movie ? (
 				<Main bgphoto={makeImagePath(movie?.backdrop_path || "")}>
-					<Video id={movie.id} part={part} />
+					<Video id={movie.id} part={part} isBanner={true} />
 					<Title>{movie.title || movie.name}</Title>
 					<Overview>{movie.overview}</Overview>
 					<Footer>

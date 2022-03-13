@@ -3,28 +3,29 @@ import styled from "styled-components";
 import { getVideos } from "../api";
 import { IVideo } from "../atoms";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isBanner: boolean }>`
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	height: 100%;
 	transform: translate(-50%, -50%);
 	overflow: hidden;
 	iframe {
 		position: relative;
-		top: -50px;
+		top: ${(props) => (props.isBanner ? "-65px" : "-120px")};
 		width: 100%;
-		height: 115%;
+		height: ${(props) => (props.isBanner ? "115%" : "150%")};
 	}
 `;
 
 interface IGetVideo {
 	id: number;
 	part: string;
+	isBanner: boolean;
 }
 
-const Video = ({ id, part }: IGetVideo) => {
+const Video = ({ id, part, isBanner }: IGetVideo) => {
 	const [videoKey, setVideoKey] = useState("");
 	useEffect(() => {
 		(async () => {
@@ -38,11 +39,11 @@ const Video = ({ id, part }: IGetVideo) => {
 			setVideoKey(videoKey);
 		})();
 	}, [id, part]);
-	console.log(videoKey);
+
 	return (
 		<>
 			{videoKey ? (
-				<Wrapper>
+				<Wrapper isBanner={isBanner}>
 					<iframe
 						src={`https://www.youtube.com/embed/${videoKey}?controls=0`}
 						title="YouTube video player"

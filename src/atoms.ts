@@ -38,9 +38,9 @@ export interface IGetVideoResult {
 }
 
 export interface ISection {
-	id?: number;
-	part: string | null;
-	query?: string;
+	id: number;
+	part: string;
+	query: string;
 }
 
 export const sectionState = atom<ISection>({
