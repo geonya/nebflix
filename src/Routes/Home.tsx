@@ -17,25 +17,25 @@ const Wrapper = styled.div`
 `;
 
 function Home() {
+	const part = "movie";
 	const { query } = useRecoilValue(sectionState);
 	const { data: nowPlayingData, isLoading: nowPlayingLoading } =
 		useQuery<IGetMovieResult>(
-			["nowPlayingData", "movie"],
+			["nowPlayingData", part],
 			getNowPlayingMovies
 		);
 	const { data: popularData, isLoading: popularLoading } =
-		useQuery<IGetMovieResult>(["popularData", "movie"], getPopularMovies);
+		useQuery<IGetMovieResult>(["popularData", part], getPopularMovies);
 	const { data: topRatedData, isLoading: topRatedLoading } =
-		useQuery<IGetMovieResult>(["topRatedData", "movie"], getTopRatedMovies);
+		useQuery<IGetMovieResult>(["topRatedData", part], getTopRatedMovies);
 	const { data: upcomingData, isLoading: upcomingLoading } =
-		useQuery<IGetMovieResult>(["upcomingData", "movie"], getUpcomingMovies);
-
+		useQuery<IGetMovieResult>(["upcomingData", part], getUpcomingMovies);
 	return (
 		<Wrapper>
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
 			) : (
-				<Banner movies={nowPlayingData?.results} part="movie" />
+				<Banner movies={nowPlayingData?.results} part={part} />
 			)}
 			{nowPlayingLoading ? (
 				<span>Loading...</span>
@@ -44,7 +44,7 @@ function Home() {
 					title="지금 상영 중"
 					movies={nowPlayingData?.results}
 					query="nowPlayingData"
-					part="movie"
+					part={part}
 				/>
 			)}
 			{popularLoading ? (
@@ -54,7 +54,7 @@ function Home() {
 					title="인기 영화"
 					movies={popularData?.results}
 					query="popularData"
-					part="movie"
+					part={part}
 				/>
 			)}
 			{topRatedLoading ? (
@@ -64,7 +64,7 @@ function Home() {
 					title="명작 영화"
 					movies={topRatedData?.results}
 					query="topRatedData"
-					part="movie"
+					part={part}
 				/>
 			)}
 			{upcomingLoading ? (
@@ -74,7 +74,7 @@ function Home() {
 					title="개봉 예정"
 					movies={upcomingData?.results}
 					query="upcomingData"
-					part="movie"
+					part={part}
 				/>
 			)}
 			{query ? <InfoBox /> : null}

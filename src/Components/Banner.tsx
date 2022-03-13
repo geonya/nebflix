@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
-
 import styled from "styled-components";
 
-import { IMovie, videoState } from "../atoms";
+import { IMovie } from "../atoms";
 import { makeImagePath } from "../utils";
 import FavBtn from "./FavBtn";
 import { PlayBtn } from "./PlayBtn";
@@ -20,6 +17,7 @@ const Main = styled.div<{ bgphoto: string }>`
 	background-image: url(${(props) => props.bgphoto});
 	background-size: cover;
 	overflow: hidden;
+	background-color: ${(props) => (props.bgphoto ? "trasparent" : "black")};
 `;
 
 const Title = styled.h1`
@@ -48,22 +46,21 @@ interface IBanner {
 }
 
 const Banner = ({ movies, part }: IBanner) => {
-	const isVideo = useRecoilValue(videoState);
-	const [randomIndex, setRanDomIndex] = useState(0);
-	useEffect(() => {
-		setRanDomIndex(Math.ceil(Math.random() * 20));
-	}, []);
-	const movie = movies ? movies[randomIndex] : null;
+	const movie = movies ? movies[0] : null;
 	return (
 		<>
 			{movie ? (
 				<Main bgphoto={makeImagePath(movie?.backdrop_path || "")}>
-					{isVideo ? <Video movie={movie} part={part} /> : null}
-					<Title>{movie?.title || movie?.name}</Title>
-					<Overview>{movie?.overview}</Overview>
+					<Video id={movie.id} part={part} />
+					<Title>{movie.title || movie.name}</Title>
+					<Overview>{movie.overview}</Overview>
 					<Footer>
 						<PlayBtn />
-						<FavBtn id={movie.id} part={part} movie={movie} />
+						<FavBtn
+							id={movie.id}
+							part={part}
+							movie={movie || undefined}
+						/>
 					</Footer>
 				</Main>
 			) : null}

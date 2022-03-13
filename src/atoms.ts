@@ -27,7 +27,7 @@ export interface IGetMovieResult {
 
 export interface IVideo {
 	name: string;
-	id: string;
+	id: number;
 	key: string;
 	type: string;
 }
@@ -66,7 +66,7 @@ export const favState = atom<IMovie[]>({
 	effects: [localStorageEffects("favs")],
 });
 
-export const videoState = atom({
-	key: "video",
-	default: false,
+export const videoKeyState = atom({
+	key: "videoKey",
+	default: "",
 });

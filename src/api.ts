@@ -61,8 +61,8 @@ export function findTvShows(keyword: string | null) {
 	).then((response) => response.json());
 }
 
-export function getVideos(movieId?: number, section?: string) {
-	return fetch(
-		`${BASE_PATH}/${section}/${movieId}/videos?api_key=${API_KEY}`
-	).then((response) => response.json());
+export async function getVideos(id?: number, part?: string) {
+	return await (
+		await fetch(`${BASE_PATH}/${part}/${id}/videos?api_key=${API_KEY}`)
+	).json();
 }

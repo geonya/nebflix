@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { getVideos } from "../api";
-import { IGetVideoResult, IMovie, videoState } from "../atoms";
+import { IVideo } from "../atoms";
 
 const Wrapper = styled.div`
 	position: absolute;
@@ -21,43 +19,39 @@ const Wrapper = styled.div`
 	}
 `;
 
-interface IVideo {
-	movie: IMovie;
+interface IGetVideo {
+	id: number;
 	part: string;
 }
 
-const Video = ({ movie, part }: IVideo) => {
-	const setIsVideo = useSetRecoilState(videoState);
+const Video = ({ id, part }: IGetVideo) => {
 	const [videoKey, setVideoKey] = useState("");
-	const { data: videos, isLoading: videoLoading } = useQuery<IGetVideoResult>(
-		[],
-		() => {
-			setIsVideo(true);
-			return getVideos(movie.id, part);
-		}
-	);
-
 	useEffect(() => {
-		if (videos?.results?.length !== 0) {
-			const key =
-				videos?.results[
-					Math.ceil(Math.random() * (videos?.results.length - 1))
-				].key || "";
-			setVideoKey(key);
-			setIsVideo(true);
-		} else {
-			setIsVideo(false);
-		}
-	}, [videos?.results]);
+		(async () => {
+			const { results } = await getVideos(id, part);
+			const trailer = results.filter(
+				(result: IVideo) => result.type === "Trailer"
+			);
+			const randomVideo =
+				trailer[Math.ceil(Math.random() * (trailer.length - 1))];
+			const videoKey = randomVideo?.key;
+			setVideoKey(videoKey);
+		})();
+	}, [id, part]);
+	console.log(videoKey);
 	return (
-		<Wrapper>
-			<iframe
-				src={`https://www.youtube.com/embed/${videoKey}?controls=0`}
-				title="YouTube video player"
-				frameBorder="0"
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-			></iframe>
-		</Wrapper>
+		<>
+			{videoKey ? (
+				<Wrapper>
+					<iframe
+						src={`https://www.youtube.com/embed/${videoKey}?controls=0`}
+						title="YouTube video player"
+						frameBorder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+					></iframe>
+				</Wrapper>
+			) : null}
+		</>
 	);
 };
 
