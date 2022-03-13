@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 import { IMovie } from "../atoms";
@@ -46,10 +47,11 @@ interface IBanner {
 }
 
 const Banner = ({ movies, part }: IBanner) => {
-	const movie = movies
-		? movies[Math.ceil(Math.random() * (movies.length - 1))]
-		: null;
-
+	const [movie, setMovie] = useState<IMovie>();
+	useEffect(() => {
+		if (movies)
+			setMovie(movies[Math.ceil(Math.random() * (movies.length - 1))]);
+	}, [movies]);
 	return (
 		<>
 			{movie ? (

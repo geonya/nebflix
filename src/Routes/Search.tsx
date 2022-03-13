@@ -87,93 +87,103 @@ function Search() {
 	const [searchParams] = useSearchParams();
 	const keyword = searchParams.get("keyword");
 	const { data: movies, isLoading: isMovieLoading } =
-		useQuery<IGetMovieResult>(["searchedMovie", "search"], () =>
+		useQuery<IGetMovieResult>([keyword, "movie"], () =>
 			findMovies(keyword)
 		);
 	const { data: tvShows, isLoading: isTvLoading } = useQuery<IGetMovieResult>(
-		["searchedTv", "search"],
+		[keyword, "tv"],
 		() => findTvShows(keyword)
 	);
 	const onBoxClicked = ({ id, query, part }: ISection) => {
-		setSection({ id, query, part });
+		setSection({ id, query: keyword || "", part });
 	};
 	return (
 		<Wrapper>
 			<TableTitle>영화</TableTitle>
-			{!isMovieLoading ? (
-				<SearchTable>
-					{movies?.results.map((movie) => (
-						<Box
-							key={movie.id}
-							variants={boxVariants}
-							layoutId={"searchedMovie" + movie.id}
-							initial="normal"
-							whileHover="hover"
-							transition={{ type: "tween" }}
-							bgphoto={makeImagePath(
-								movie.backdrop_path ?? movie.poster_path,
-								"w500"
-							)}
-							onClick={() =>
-								onBoxClicked({
-									part: "search",
-									id: movie.id,
-									query: "searchedMovie",
-								})
-							}
-						>
-							<Info variants={infoVariants}>
-								<motion.h4>
-									{movie.name || movie.title}
-								</motion.h4>
-								<motion.svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 512 512"
+			{keyword ? (
+				<>
+					{!isMovieLoading ? (
+						<SearchTable>
+							{movies?.results.map((movie) => (
+								<Box
+									key={movie.id}
+									variants={boxVariants}
+									layoutId={keyword + movie.id}
+									initial="normal"
+									whileHover="hover"
+									transition={{ type: "tween" }}
+									bgphoto={makeImagePath(
+										movie.backdrop_path ??
+											movie.poster_path,
+										"w500"
+									)}
+									onClick={() =>
+										onBoxClicked({
+											part: "movie",
+											id: movie.id,
+											query: keyword,
+										})
+									}
 								>
-									<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
-								</motion.svg>
-							</Info>
-						</Box>
-					))}
-				</SearchTable>
+									<Info variants={infoVariants}>
+										<motion.h4>
+											{movie.name || movie.title}
+										</motion.h4>
+										<motion.svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 512 512"
+										>
+											<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
+										</motion.svg>
+									</Info>
+								</Box>
+							))}
+						</SearchTable>
+					) : null}
+				</>
 			) : null}
 			<TableTitle>시리즈</TableTitle>
-			{!isTvLoading ? (
-				<SearchTable>
-					{tvShows?.results.map((movie) => (
-						<Box
-							key={movie.id}
-							variants={boxVariants}
-							layoutId={"searchedTv" + movie.id}
-							initial="normal"
-							whileHover="hover"
-							transition={{ type: "tween" }}
-							bgphoto={makeImagePath(
-								movie.backdrop_path ?? movie.poster_path,
-								"w500"
-							)}
-							onClick={() =>
-								onBoxClicked({
-									part: "search",
-									id: movie.id,
-									query: "searchedTv",
-								})
-							}
-						>
-							<Info variants={infoVariants}>
-								<motion.h4>
-									{movie.name ?? movie.title}
-								</motion.h4>
-								<motion.svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 512 512"
+			{keyword ? (
+				<>
+					{!isTvLoading ? (
+						<SearchTable>
+							{tvShows?.results.map((movie) => (
+								<Box
+									key={movie.id}
+									variants={boxVariants}
+									layoutId={keyword + movie.id}
+									initial="normal"
+									whileHover="hover"
+									transition={{ type: "tween" }}
+									bgphoto={makeImagePath(
+										movie.backdrop_path ??
+											movie.poster_path,
+										"w500"
+									)}
+									onClick={() =>
+										onBoxClicked({
+											part: "tv",
+											id: movie.id,
+											query: keyword,
+										})
+									}
 								>
-									<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
-								</motion.svg>
-							</Info>
-						</Box>
-					))}
-				</SearchTable>
+									<Info variants={infoVariants}>
+										<motion.h4>
+											{movie.name ?? movie.title}
+										</motion.h4>
+										<motion.svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 512 512"
+										>
+											<path d="M256 0C114.6 0 0 114.6 0 256c0 141.4 114.6 256 256 256s256-114.6 256-256C512 114.6 397.4 0 256 0zM390.6 246.6l-112 112C272.4 364.9 264.2 368 256 368s-16.38-3.125-22.62-9.375l-112-112c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L256 290.8l89.38-89.38c12.5-12.5 32.75-12.5 45.25 0S403.1 234.1 390.6 246.6z" />
+										</motion.svg>
+									</Info>
+								</Box>
+							))}
+						</SearchTable>
+					) : null}
+				</>
 			) : null}
 			{query ? <InfoBox /> : null}
 		</Wrapper>

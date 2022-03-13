@@ -39,7 +39,6 @@ const Video = ({ id, part, isBanner }: IGetVideo) => {
 			setVideoKey(videoKey);
 		})();
 	}, [id, part]);
-
 	return (
 		<>
 			{videoKey ? (
